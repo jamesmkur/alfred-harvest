@@ -40,4 +40,6 @@
   $query = "Started —" . " " . $project;
   echo $query;
 
+  require('get_daily.php');
+
 ?>

@@ -33,6 +33,8 @@
     }
 
     echo $query;
+
+    require('get_daily.php');
   }
 
 ?>
