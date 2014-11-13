@@ -21,37 +21,44 @@
       $id      = $project["id"];
 
       if ( !$query ) {
-        $xml .= "<item valid=\"no\" uid=\"harvestnew-$id\" autocomplete=\"$name → \">\n";
+        $xml .= "<item valid=\"no\" uid=\"harvestnew-$id\" autocomplete=\"$id → \">\n";
         $xml .= "<title>$name, $client</title>\n";
-        $xml .= "<subtitle>View available tasks...</subtitle>\n";
+        $xml .= "<subtitle>Project: $id</subtitle>\n";
         $xml .= "<icon>icons/add.png</icon>\n";
         $xml .= "</item>\n";
       } elseif ( stripos($name . $client, $query) !== false ) {
-        $xml .= "<item valid=\"no\" uid=\"harvestnew-$id\" autocomplete=\"$name → \">\n";
+        $xml .= "<item valid=\"no\" uid=\"harvestnew-$id\" autocomplete=\"$id → \">\n";
         $xml .= "<title>$name, $client</title>\n";
-        $xml .= "<subtitle>View available tasks...</subtitle>\n";
+        $xml .= "<subtitle>Project: $id</subtitle>\n";
         $xml .= "<icon>icons/add.png</icon>\n";
         $xml .= "</item>\n";
       }
     }
 
     $xml .= "</items>";
+
     echo $xml;
 
   elseif ( substr_count( $query, '→' ) == 1 ):
 
     $strings = explode( " →", $query);
-    $project_name = $strings[0];
+    $project_id = $strings[0];
     $newQuery = $strings[1];
-    $data_raw = file_get_contents($dir . 'projects.json');
-    $data = json_decode($data_raw, true);
+
+    if (file_exists($dir . 'projects.json')) {
+      $data_raw = file_get_contents($dir . 'projects.json');
+      $data = json_decode($data_raw, true);
+    } else {
+      require('get_daily.php');
+      $data = json_decode($response, true);
+    }
 
     foreach ( $data["projects"] as $project ){
 
-      if ( $project["name"] == $project_name ) {
+      if ( $project["id"] == $project_id ) {
         $project_tasks = $project["tasks"];
-        $project_name = $project["name"];
-        $project_id = $project["id"];
+        $project_name = htmlspecialchars($project["name"]);
+        $project_client = htmlspecialchars($project["client"]);
         $project_name_encoded = str_replace(" ", "_", htmlspecialchars($project_name));
       }
     }
@@ -65,13 +72,13 @@
       if ( !$newQuery ) {
         $xml .= "<item arg=\"$project_id|$task_id|$project_name_encoded\" uid=\"harvesttasks-$task_id\">\n";
         $xml .= "<title>$task_name</title>\n";
-        $xml .= "<subtitle>Start this task</subtitle>\n";
+        $xml .= "<subtitle>$project_client, $project_name</subtitle>\n";
         $xml .= "<icon>icons/go.png</icon>\n";
         $xml .= "</item>\n";
       } elseif ( stripos(" " . $task_name, $newQuery) !== false ) {
         $xml .= "<item arg=\"$project_id|$task_id|$project_name_encoded\" uid=\"harvesttasks-$task_id\">\n";
         $xml .= "<title>$task_name</title>\n";
-        $xml .= "<subtitle>Start this task</subtitle>\n";
+        $xml .= "<subtitle>$project_client, $project_name</subtitle>\n";
         $xml .= "<icon>icons/go.png</icon>\n";
         $xml .= "</item>\n";
       }

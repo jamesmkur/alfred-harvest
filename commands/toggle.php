@@ -28,7 +28,7 @@
             $xml .= "<item arg=\"$id\" uid=\"harvesttoggle-$id\">\n";
           }
 
-          $xml .= "<title>$hours hours – $project</title>\n";
+          $xml .= "<title>$project</title>\n";
 
           if ( $notes ) {
             $xml .= "<subtitle>$client, $task – \"$notes\"</subtitle>\n";
@@ -105,6 +105,7 @@
 
     $xml .= "</items>";
     echo $xml;
+
   }
 
 ?>
